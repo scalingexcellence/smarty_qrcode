@@ -36,8 +36,12 @@
  */
 
 function smarty_function_qrcode($params, &$smarty) {
-    require_once(SMARTY_PLUGINS_DIR . 'shared.escape_special_chars.php');
-
+    if (defined("SMARTY_PLUGINS_DIR")) {
+        require_once(SMARTY_PLUGINS_DIR . 'shared.escape_special_chars.php');
+    }
+    else {
+        require_once $smarty->_get_plugin_filepath('shared','escape_special_chars');
+    }
 
     //A simple built-in cache
     class FileCache {
@@ -82,7 +86,10 @@ function smarty_function_qrcode($params, &$smarty) {
     //************************************************************
     
     $keyparams = array_keys($params);
-    $smarty_keys = array_keys((array)$smarty->parent);
+    $smarty_keys =  array_merge(
+        array_keys((array)$smarty),
+        array_keys((array)$smarty->parent)
+    );
     
     //Read the value param
     if (!in_array('value', $keyparams) || (($val = trim($params['value']))=='')) {
@@ -100,13 +107,13 @@ function smarty_function_qrcode($params, &$smarty) {
     else {
         //set the default value in the temp subdirectory of phpqrcode library (should be writable)
         if (in_array('qrcode_libbase', $keyparams)) {
-            $qrcode_tmp_dir = $params['qrcode_libbase'].DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR;
+            $qrcode_tmp_dir = $params['qrcode_libbase'].'temp';
         }
         else if (in_array("qrcode_libbase", $smarty_keys) && $smarty->qrcode_libbase) {
-            $qrcode_tmp_dir = $smarty->qrcode_libbase.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR;
+            $qrcode_tmp_dir = $smarty->qrcode_libbase.'temp';
         }
         else {
-            $qrcode_tmp_dir = dirname(__FILE__).DIRECTORY_SEPARATOR.'phpqrcode'.DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR;
+            $qrcode_tmp_dir = dirname(__FILE__).DIRECTORY_SEPARATOR.'phpqrcode'.DIRECTORY_SEPARATOR.'temp';
         }
     }
     
@@ -165,11 +172,11 @@ function smarty_function_qrcode($params, &$smarty) {
         
         //Include the qrlib. Don't forget to configure it by editing qrconfig.php
         if (in_array('qrcode_libbase', $keyparams)) {
-            require_once $params['qrcode_libbase'].DIRECTORY_SEPARATOR.'qrlib.php';
+            require_once $params['qrcode_libbase'].'qrlib.php';
         }
         else if (in_array("qrcode_libbase", $smarty_keys)) {
             if ($smarty->qrcode_libbase) {
-                require_once $smarty->qrcode_libbase.DIRECTORY_SEPARATOR.'qrlib.php';
+                require_once $smarty->qrcode_libbase.'qrlib.php';
             }
         }
         else {
