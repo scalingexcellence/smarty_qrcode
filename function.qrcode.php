@@ -220,7 +220,7 @@ function smarty_function_qrcode($params, &$smarty) {
         $dwidth=$params['width'];
     }
     if (in_array('height', $keyparams)) {
-        $dwidth=$params['height'];
+        $dheight=$params['height'];
     }
     
     //The image tag
